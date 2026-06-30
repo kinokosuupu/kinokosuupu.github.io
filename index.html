@@ -413,10 +413,6 @@
       animation-duration: var(--scroll-duration, 20s);
     }
 
-    .carousel-track-wrap:hover .carousel-track {
-      animation-play-state: paused;
-    }
-
     @keyframes scrollTrack {
       from { transform: translateX(0); }
       to { transform: translateX(-50%); }
@@ -448,6 +444,57 @@
     @media (max-width: 600px) {
       .carousel-item { width: 160px; }
     }
+
+    /* hover暫停只在能用滑鼠的裝置上生效，避免手機觸控卡住跑馬燈 */
+    @media (hover: hover) {
+      .carousel-track-wrap:hover .carousel-track {
+        animation-play-state: paused;
+      }
+    }
+
+    .carousel-item img { cursor: zoom-in; }
+
+    /* ── LIGHTBOX ── */
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(10,10,10,0.94);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .lightbox-overlay.open { display: flex; }
+
+    .lightbox-overlay img {
+      width: min(75vw, 480px);
+      height: auto;
+      max-height: 80vh;
+      image-rendering: pixelated;
+      border: 1px solid var(--pink);
+      box-shadow: 0 0 40px rgba(242,184,198,0.15);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .lightbox-close:hover { color: var(--pink); border-color: var(--pink); }
 
 
     .pink-line {
@@ -516,7 +563,8 @@
       <p class="contact-label">聯絡方式</p>
       <div class="contact-row">
         <a class="contact-link" href="https://www.plurk.com/snowww0818" target="_blank">Plurk</a>
-        <a class="contact-link" href="mailto:your@email.com">Email</a>
+        <a class="contact-link" href="https://www.instagram.com/snowww0818" target="_blank">Instagram</a>
+        <a class="contact-link" href="mailto:930818mind@gmail.com">Email</a>
       </div>
     </div>
   <div class="home-carousel">
@@ -963,6 +1011,30 @@
     showPage('portfolio');
     closeMenu();
   });
+  // ── LIGHTBOX ──
+  const lightboxOverlay = document.getElementById('lightboxOverlay');
+  const lightboxImg = document.getElementById('lightboxImg');
+
+  function openLightbox(src, alt) {
+    lightboxImg.src = src;
+    lightboxImg.alt = alt || '';
+    lightboxOverlay.classList.add('open');
+  }
+
+  function closeLightbox() {
+    lightboxOverlay.classList.remove('open');
+    lightboxImg.src = '';
+  }
+
+  lightboxOverlay.addEventListener('click', (e) => {
+    if (e.target === lightboxOverlay) closeLightbox();
+  });
+
+  document.querySelectorAll('.carousel-item img, .art-item img').forEach(img => {
+    img.addEventListener('click', () => {
+      openLightbox(img.getAttribute('src'), img.getAttribute('alt'));
+    });
+  });
 </script>
 
 <!-- COMMISSION INFO -->
@@ -1015,6 +1087,12 @@
     </div>
 
   </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox-overlay" id="lightboxOverlay">
+  <button class="lightbox-close" onclick="closeLightbox()" aria-label="關閉">✕</button>
+  <img id="lightboxImg" src="" alt="">
 </div>
 
 </body>
