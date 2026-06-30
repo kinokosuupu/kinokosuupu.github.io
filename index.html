@@ -469,9 +469,11 @@
     .lightbox-overlay.open { display: flex; }
 
     .lightbox-overlay img {
-      width: min(75vw, 480px);
+      width: auto;
       height: auto;
+      max-width: min(85vw, 480px);
       max-height: 80vh;
+      min-width: 200px;
       image-rendering: pixelated;
       border: 1px solid var(--pink);
       box-shadow: 0 0 40px rgba(242,184,198,0.15);
