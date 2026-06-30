@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>阿恆 · Pixel Art Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #1a1a1a;
+      --surface: #242424;
+      --surface2: #2e2e2e;
+      --text: #f0f0f0;
+      --muted: #9e9e9e;
+      --pink: #f2b8c6;
+      --pink-dim: rgba(242,184,198,0.12);
+      --border: rgba(255,255,255,0.07);
+    }
+
+    html { scroll-behavior: smooth; color-scheme: dark; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+
+    img { image-rendering: pixelated; image-rendering: crisp-edges; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      background: rgba(26,26,26,0.85);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+
+    .hamburger {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 4px;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 1.5px;
+      background: var(--text);
+      transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s ease;
+      transform-origin: center;
+    }
+
+    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); background: var(--pink); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); background: var(--pink); }
+
+    /* ── MENU OVERLAY ── */
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      background: rgba(26,26,26,0.97);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .menu-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .menu-item {
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .menu-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.2s ease;
+      cursor: pointer;
+    }
+
+    .menu-link:hover, .menu-link.active-section { color: var(--text); }
+
+    .menu-link .arrow {
+      font-size: 1rem;
+      transition: transform 0.2s ease;
+      color: var(--pink);
+    }
+
+    .submenu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .submenu.open { max-height: 200px; }
+
+    .submenu a {
+      display: block;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: color 0.2s ease, padding-left 0.2s ease;
+    }
+
+    .submenu a::before {
+      content: '·  ';
+      color: var(--pink);
+    }
+
+    .submenu a:hover { color: var(--pink); padding-left: 24px; }
+
+    /* ── PAGE WRAPPER ── */
+    .page { display: none; padding-top: 80px; min-height: 100vh; }
+    .page.active { display: block; }
+
+    /* ── HOME ── */
+    #home {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 80px 40px 40px;
+    }
+
+    #home.active {
+      display: flex;
+    }
+
+    .home-inner {
+      max-width: 760px;
+      width: 100%;
+    }
+
+    .home-carousel {
+      margin-top: 48px;
+      width: 100%;
+    }
+
+    .home-tag {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--pink);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .home-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      line-height: 1.1;
+      margin-bottom: 24px;
+      color: #ffffff;
+    }
+
+    .home-bio {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--muted);
+      margin-bottom: 40px;
+      max-width: 480px;
+    }
+
+    .home-contact {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .contact-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      color: var(--pink);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .contact-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .contact-link {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      padding-bottom: 1px;
+    }
+
+    .contact-link:hover { color: var(--pink); border-color: var(--pink); }
+
+    /* ── PORTFOLIO OVERVIEW ── */
+    #portfolio {
+      display: none;
+      min-height: 100vh;
+      padding: 80px 40px 60px;
+    }
+
+    #portfolio.active { display: block; }
+
+    .section-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: var(--pink);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      margin-bottom: 48px;
+      color: #ffffff;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      max-width: 960px;
+    }
+
+    .overview-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+      display: block;
+    }
+
+    .overview-card:hover {
+      transform: scale(0.97);
+      border-color: var(--pink);
+      box-shadow: 0 0 20px rgba(242,184,198,0.1);
+    }
+
+    .card-img {
+      width: 100%;
+      aspect-ratio: 1/1;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 16px;
+    }
+
+    /* placeholder pixel art grid */
+    .pixel-placeholder {
+      width: 64px;
+      height: 64px;
+      image-rendering: pixelated;
+    }
+
+    .card-label {
+      padding: 16px 20px;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-label .arrow-sm { color: var(--pink); font-size: 0.9rem; }
+
+    /* ── CATEGORY PAGE ── */
+    .cat-page {
+      display: none;
+      min-height: 100vh;
+      padding: 80px 40px 60px;
+    }
+
+    .cat-page.active { display: block; }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      margin-bottom: 40px;
+      transition: color 0.2s;
+    }
+
+    .back-btn:hover { color: var(--pink); }
+
+    .art-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      max-width: 960px;
+    }
+
+    .art-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      aspect-ratio: 1/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s ease;
+    }
+
+    .art-item:hover { border-color: var(--pink-dim); }
+
+    .art-item img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      padding: 12px;
+    }
+
+    /* ── SUB-GROUP CAROUSEL ── */
+    .subgroup {
+      margin-bottom: 56px;
+    }
+
+    .subgroup-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+      color: var(--text);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .subgroup-title::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--pink);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .carousel-track-wrap {
+      overflow: hidden;
+      position: relative;
+      -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+    }
+
+    .carousel-track {
+      display: flex;
+      gap: 16px;
+      width: max-content;
+      animation: scrollTrack linear infinite;
+      animation-duration: var(--scroll-duration, 20s);
+    }
+
+    .carousel-track-wrap:hover .carousel-track {
+      animation-play-state: paused;
+    }
+
+    @keyframes scrollTrack {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    .carousel-item {
+      flex: 0 0 auto;
+      width: 160px;
+      aspect-ratio: 1/1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
+
+    .carousel-item:hover { border-color: var(--pink-dim); }
+
+    .carousel-item img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      padding: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .carousel-item { width: 120px; }
+    }
+
+
+    .pink-line {
+      width: 32px;
+      height: 1px;
+      background: var(--pink);
+      margin-bottom: 32px;
+      opacity: 0.6;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      nav { padding: 16px 24px; }
+      #home, #portfolio, .cat-page { padding-left: 24px; padding-right: 24px; }
+      .overview-grid { grid-template-columns: 1fr; }
+      .art-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#" onclick="showPage('home'); return false;">阿恆</a>
+  <button class="hamburger" id="hamburger" aria-label="選單">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MENU OVERLAY -->
+<div class="menu-overlay" id="menuOverlay">
+  <div class="menu-item">
+    <a class="menu-link" onclick="showPage('home'); closeMenu();">首頁</a>
+  </div>
+  <div class="menu-item">
+    <div class="menu-link" id="portfolioToggle">
+      作品集 <span class="arrow" id="portfolioArrow">↓</span>
+    </div>
+    <div class="submenu" id="portfolioSubmenu">
+      <a href="#" onclick="showPage('cat-character'); closeMenu(); return false;">角色</a>
+      <a href="#" onclick="showPage('cat-scene'); closeMenu(); return false;">角色＋場景</a>
+      <a href="#" onclick="showPage('cat-animal'); closeMenu(); return false;">角色＋動物</a>
+    </div>
+    <a class="menu-link" style="font-size:1.1rem; border-top: none; padding-top:0;" onclick="showPage('portfolio'); closeMenu();">→ 全部預覽</a>
+  </div>
+  <div class="menu-item">
+    <a class="menu-link" onclick="showPage('commission'); closeMenu();">委託須知</a>
+  </div>
+</div>
+
+<!-- HOME PAGE -->
+<div id="home" class="page active">
+  <div class="home-inner">
+    <p class="home-tag">Pixel Artist · Character Designer</p>
+    <h1 class="home-name">阿恆</h1>
+    <div class="pink-line"></div>
+    <p class="home-bio">
+      像素繪師，從事自由接案經驗超過6年，擅長繪製角色像素及像素插圖。<br>
+      目前長期接案中，歡迎聯絡合作。
+    </p>
+    <div class="home-contact">
+      <p class="contact-label">聯絡方式</p>
+      <div class="contact-row">
+        <a class="contact-link" href="https://www.plurk.com/snowww0818" target="_blank">Plurk</a>
+        <a class="contact-link" href="mailto:your@email.com">Email</a>
+      </div>
+    </div>
+  <div class="home-carousel">
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 35s;">
+        <div class="carousel-item"><img src="images/scene/48x144-1.png" alt="場景1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-2.png" alt="場景2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-3.png" alt="場景3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-4.png" alt="場景4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-5.png" alt="場景5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-6.png" alt="場景6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-7.png" alt="場景7" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版1.png" alt="非滿版1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版2.png" alt="非滿版2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版3.png" alt="非滿版3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版4.png" alt="非滿版4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版5.png" alt="非滿版5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版6.png" alt="非滿版6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版7.png" alt="非滿版7" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版8.png" alt="非滿版8" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-1.png" alt="場景1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-2.png" alt="場景2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-3.png" alt="場景3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-4.png" alt="場景4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-5.png" alt="場景5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-6.png" alt="場景6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-7.png" alt="場景7" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版1.png" alt="非滿版1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版2.png" alt="非滿版2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版3.png" alt="非滿版3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版4.png" alt="非滿版4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版5.png" alt="非滿版5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版6.png" alt="非滿版6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版7.png" alt="非滿版7" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版8.png" alt="非滿版8" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</div>
+
+<!-- PORTFOLIO OVERVIEW -->
+<div id="portfolio" class="page">
+  <p class="section-eyebrow">Works</p>
+  <h2 class="section-title">作品集</h2>
+  <div class="overview-grid">
+    <a class="overview-card" href="#" onclick="showPage('cat-character'); return false;">
+      <div class="card-img">
+        <img src="images/cover/角色代表圖.png" alt="角色" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <svg class="pixel-placeholder" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+          <rect x="5" y="1" width="6" height="6" fill="#9e9e9e"/>
+          <rect x="3" y="7" width="10" height="8" fill="#7a7a7a"/>
+          <rect x="6" y="2" width="1" height="1" fill="#f2b8c6"/>
+          <rect x="9" y="2" width="1" height="1" fill="#f2b8c6"/>
+          <rect x="6" y="5" width="4" height="1" fill="#f2b8c6"/>
+        </svg>
+      </div>
+      <div class="card-label">角色 <span class="arrow-sm">→</span></div>
+    </a>
+    <a class="overview-card" href="#" onclick="showPage('cat-scene'); return false;">
+      <div class="card-img">
+        <img src="images/cover/角色_場景代表圖.png" alt="角色＋場景" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <svg class="pixel-placeholder" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+          <rect x="0" y="10" width="16" height="6" fill="#7a7a7a"/>
+          <rect x="0" y="6" width="16" height="4" fill="#5a5a5a"/>
+          <rect x="0" y="0" width="16" height="6" fill="#3a3a3a"/>
+          <rect x="6" y="5" width="4" height="7" fill="#9e9e9e"/>
+          <rect x="7" y="6" width="1" height="1" fill="#f2b8c6"/>
+          <rect x="9" y="6" width="1" height="1" fill="#f2b8c6"/>
+        </svg>
+      </div>
+      <div class="card-label">角色＋場景 <span class="arrow-sm">→</span></div>
+    </a>
+    <a class="overview-card" href="#" onclick="showPage('cat-animal'); return false;">
+      <div class="card-img">
+        <img src="images/cover/角色_動物代表圖.png" alt="角色＋動物" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <svg class="pixel-placeholder" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+          <rect x="5" y="1" width="6" height="6" fill="#9e9e9e"/>
+          <rect x="3" y="7" width="10" height="5" fill="#7a7a7a"/>
+          <rect x="1" y="9" width="3" height="4" fill="#8a8a8a"/>
+          <rect x="12" y="9" width="3" height="4" fill="#8a8a8a"/>
+          <rect x="2" y="7" width="2" height="2" fill="#9e9e9e"/>
+          <rect x="13" y="7" width="2" height="2" fill="#9e9e9e"/>
+          <rect x="6" y="2" width="1" height="1" fill="#f2b8c6"/>
+          <rect x="9" y="2" width="1" height="1" fill="#f2b8c6"/>
+        </svg>
+      </div>
+      <div class="card-label">角色＋動物 <span class="arrow-sm">→</span></div>
+    </a>
+  </div>
+</div>
+
+<!-- CATEGORY: 角色 -->
+<div id="cat-character" class="cat-page">
+  <button class="back-btn" onclick="showPage('portfolio')">← 回作品集</button>
+  <p class="section-eyebrow">Character</p>
+  <h2 class="section-title">角色</h2>
+  <div class="subgroup">
+    <p class="subgroup-title">下午茶</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 20s;">
+        <div class="carousel-item"><img src="images/character/下午茶1.png" alt="下午茶1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/下午茶2.png" alt="下午茶2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/下午茶3.png" alt="下午茶3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/下午茶1.png" alt="下午茶1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/下午茶2.png" alt="下午茶2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/下午茶3.png" alt="下午茶3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">大</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 20s;">
+        <div class="carousel-item"><img src="images/character/大1.png" alt="大1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/大2.png" alt="大2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/大1.png" alt="大1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/大2.png" alt="大2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">小小的</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 20s;">
+        <div class="carousel-item"><img src="images/character/小小的1.png" alt="小小的1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/小小的2.png" alt="小小的2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/小小的1.png" alt="小小的1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/小小的2.png" alt="小小的2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">音樂盒</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 20s;">
+        <div class="carousel-item"><img src="images/character/音樂盒1.png" alt="音樂盒1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/音樂盒2.png" alt="音樂盒2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/音樂盒3.png" alt="音樂盒3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/音樂盒4.png" alt="音樂盒4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/音樂盒5.png" alt="音樂盒5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/音樂盒1.png" alt="音樂盒1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/音樂盒2.png" alt="音樂盒2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/音樂盒3.png" alt="音樂盒3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/音樂盒4.png" alt="音樂盒4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/音樂盒5.png" alt="音樂盒5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">站姿</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 20s;">
+        <div class="carousel-item"><img src="images/character/站姿1.png" alt="站姿1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿2.png" alt="站姿2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿3.png" alt="站姿3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿4.png" alt="站姿4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿5.png" alt="站姿5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿6.png" alt="站姿6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿7.png" alt="站姿7" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿8.png" alt="站姿8" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿9.png" alt="站姿9" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿10.png" alt="站姿10" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿11.png" alt="站姿11" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿1.png" alt="站姿1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿2.png" alt="站姿2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿3.png" alt="站姿3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿4.png" alt="站姿4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿5.png" alt="站姿5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿6.png" alt="站姿6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿7.png" alt="站姿7" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿8.png" alt="站姿8" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿9.png" alt="站姿9" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿10.png" alt="站姿10" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿11.png" alt="站姿11" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">站姿小</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 20s;">
+        <div class="carousel-item"><img src="images/character/站姿小1.png" alt="站姿小1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿小2.png" alt="站姿小2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿小3.png" alt="站姿小3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿小1.png" alt="站姿小1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿小2.png" alt="站姿小2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/站姿小3.png" alt="站姿小3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">舉高高</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 20s;">
+        <div class="carousel-item"><img src="images/character/舉高高1.png" alt="舉高高1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/舉高高2.png" alt="舉高高2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/舉高高3.png" alt="舉高高3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/舉高高4.png" alt="舉高高4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/舉高高1.png" alt="舉高高1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/舉高高2.png" alt="舉高高2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/舉高高3.png" alt="舉高高3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/舉高高4.png" alt="舉高高4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">蹭蹭</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 20s;">
+        <div class="carousel-item"><img src="images/character/蹭蹭1.png" alt="蹭蹭1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/蹭蹭2.png" alt="蹭蹭2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/蹭蹭3.png" alt="蹭蹭3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/蹭蹭4.png" alt="蹭蹭4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/蹭蹭5.png" alt="蹭蹭5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/蹭蹭6.png" alt="蹭蹭6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/蹭蹭1.png" alt="蹭蹭1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/蹭蹭2.png" alt="蹭蹭2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/蹭蹭3.png" alt="蹭蹭3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/蹭蹭4.png" alt="蹭蹭4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/蹭蹭5.png" alt="蹭蹭5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/蹭蹭6.png" alt="蹭蹭6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">甜點魔女</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 14s;">
+        <div class="carousel-item"><img src="images/character/甜點魔女.png" alt="甜點魔女" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/甜點魔女.png" alt="甜點魔女" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">善逸獪岳</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 14s;">
+        <div class="carousel-item"><img src="images/character/善逸獪岳.png" alt="善逸獪岳" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/character/善逸獪岳.png" alt="善逸獪岳" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CATEGORY: 角色＋場景 -->
+<div id="cat-scene" class="cat-page">
+  <button class="back-btn" onclick="showPage('portfolio')">← 回作品集</button>
+  <p class="section-eyebrow">Character × Scene</p>
+  <h2 class="section-title">角色＋場景</h2>
+  <div class="subgroup">
+    <p class="subgroup-title">48×144系列</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 24s;">
+        <div class="carousel-item"><img src="images/scene/48x144-1.png" alt="48×144系列1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-2.png" alt="48×144系列2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-3.png" alt="48×144系列3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-4.png" alt="48×144系列4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-5.png" alt="48×144系列5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-6.png" alt="48×144系列6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-7.png" alt="48×144系列7" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-1.png" alt="48×144系列1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-2.png" alt="48×144系列2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-3.png" alt="48×144系列3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-4.png" alt="48×144系列4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-5.png" alt="48×144系列5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-6.png" alt="48×144系列6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/48x144-7.png" alt="48×144系列7" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">非滿版</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 22s;">
+        <div class="carousel-item"><img src="images/scene/非滿版1.png" alt="非滿版1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版2.png" alt="非滿版2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版3.png" alt="非滿版3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版4.png" alt="非滿版4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版5.png" alt="非滿版5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版6.png" alt="非滿版6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版7.png" alt="非滿版7" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版8.png" alt="非滿版8" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版1.png" alt="非滿版1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版2.png" alt="非滿版2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版3.png" alt="非滿版3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版4.png" alt="非滿版4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版5.png" alt="非滿版5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版6.png" alt="非滿版6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版7.png" alt="非滿版7" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/scene/非滿版8.png" alt="非滿版8" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CATEGORY: 角色＋動物 -->
+<div id="cat-animal" class="cat-page">
+  <button class="back-btn" onclick="showPage('portfolio')">← 回作品集</button>
+  <p class="section-eyebrow">Character × Animal</p>
+  <h2 class="section-title">角色＋動物</h2>
+  <div class="subgroup">
+    <p class="subgroup-title">企鵝</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 20s;">
+        <div class="carousel-item"><img src="images/animal/企鵝1.png" alt="企鵝1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/企鵝2.png" alt="企鵝2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/企鵝3.png" alt="企鵝3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/企鵝4.png" alt="企鵝4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/企鵝1.png" alt="企鵝1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/企鵝2.png" alt="企鵝2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/企鵝3.png" alt="企鵝3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/企鵝4.png" alt="企鵝4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">冰淇淋</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 20s;">
+        <div class="carousel-item"><img src="images/animal/冰淇淋1.png" alt="冰淇淋1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/冰淇淋2.png" alt="冰淇淋2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/冰淇淋3.png" alt="冰淇淋3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/冰淇淋4.png" alt="冰淇淋4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/冰淇淋5.png" alt="冰淇淋5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/冰淇淋6.png" alt="冰淇淋6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/冰淇淋1.png" alt="冰淇淋1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/冰淇淋2.png" alt="冰淇淋2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/冰淇淋3.png" alt="冰淇淋3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/冰淇淋4.png" alt="冰淇淋4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/冰淇淋5.png" alt="冰淇淋5" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/冰淇淋6.png" alt="冰淇淋6" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">守宮</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 20s;">
+        <div class="carousel-item"><img src="images/animal/守宮1.png" alt="守宮1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/守宮2.png" alt="守宮2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/守宮3.png" alt="守宮3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/守宮4.png" alt="守宮4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/守宮1.png" alt="守宮1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/守宮2.png" alt="守宮2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/守宮3.png" alt="守宮3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/守宮4.png" alt="守宮4" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">底片</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 20s;">
+        <div class="carousel-item"><img src="images/animal/底片1.png" alt="底片1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/底片2.png" alt="底片2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/底片3.png" alt="底片3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/底片1.png" alt="底片1" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/底片2.png" alt="底片2" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/底片3.png" alt="底片3" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">烏鴉鐘</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 14s;">
+        <div class="carousel-item"><img src="images/animal/烏鴉鐘.png" alt="烏鴉鐘" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/烏鴉鐘.png" alt="烏鴉鐘" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        
+      </div>
+    </div>
+  </div>
+  <div class="subgroup">
+    <p class="subgroup-title">搖滾狗</p>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" style="--scroll-duration: 14s;">
+        <div class="carousel-item"><img src="images/animal/搖滾狗.png" alt="搖滾狗" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        <div class="carousel-item"><img src="images/animal/搖滾狗.png" alt="搖滾狗" onerror="this.parentElement.style.opacity=0.25; this.style.display='none'; this.parentElement.innerHTML='<svg width="64" height="64" viewBox="0 0 12 24" style="image-rendering:pixelated"><rect x="3" y="0" width="6" height="6" fill="#9e9e9e"/><rect x="2" y="6" width="8" height="10" fill="#7a7a7a"/></svg>'.trim();"></div>
+        
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── PAGE ROUTING ──
+  const pages = ['home', 'portfolio', 'cat-character', 'cat-scene', 'cat-animal', 'commission'];
+
+  function showPage(id) {
+    pages.forEach(p => {
+      const el = document.getElementById(p);
+      if (el) el.classList.remove('active');
+    });
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // ── HAMBURGER ──
+  const hamburger = document.getElementById('hamburger');
+  const menuOverlay = document.getElementById('menuOverlay');
+
+  hamburger.addEventListener('click', () => {
+    const isOpen = menuOverlay.classList.toggle('open');
+    hamburger.classList.toggle('open', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
+
+  function closeMenu() {
+    menuOverlay.classList.remove('open');
+    hamburger.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ── PORTFOLIO SUBMENU TOGGLE ──
+  const portfolioToggle = document.getElementById('portfolioToggle');
+  const portfolioSubmenu = document.getElementById('portfolioSubmenu');
+  const portfolioArrow = document.getElementById('portfolioArrow');
+
+  portfolioToggle.addEventListener('click', () => {
+    portfolioSubmenu.classList.toggle('open');
+    portfolioArrow.textContent = portfolioSubmenu.classList.contains('open') ? '↑' : '↓';
+  });
+
+  // ── DIRECT PORTFOLIO LINK CLICK ──
+  // clicking the main 作品集 text (not the arrow area) goes to overview
+  portfolioToggle.addEventListener('dblclick', () => {
+    showPage('portfolio');
+    closeMenu();
+  });
+</script>
+
+<!-- COMMISSION INFO -->
+<div id="commission" class="cat-page">
+  <p class="section-eyebrow">Commission Info</p>
+  <h2 class="section-title">委託須知</h2>
+
+  <div style="max-width:600px; display:flex; flex-direction:column; gap:32px;">
+
+    <div>
+      <p class="contact-label">接受委託類型</p>
+      <p style="color:var(--muted); line-height:1.8; font-size:0.9rem;">像素插圖・像素模板繪製</p>
+    </div>
+
+    <div>
+      <p class="contact-label">報價方式</p>
+      <p style="color:var(--muted); line-height:1.8; font-size:0.9rem;">依素材類型、尺寸、複雜度個別報價，請寄信說明需求後詢價</p>
+    </div>
+
+    <div>
+      <p class="contact-label">委託流程</p>
+      <p style="color:var(--muted); line-height:1.8; font-size:0.9rem;">
+        ① 詢價 → ② 確認需求與報價 → ③ 預付訂金 → ④ 提供草稿確認 → ⑤ 修改（含2次）→ ⑥ 尾款付清後交付完稿
+      </p>
+    </div>
+
+    <div>
+      <p class="contact-label">修改次數</p>
+      <p style="color:var(--muted); line-height:1.8; font-size:0.9rem;">草稿階段含2次修改，完稿後微調另議</p>
+    </div>
+
+    <div>
+      <p class="contact-label">付款方式</p>
+      <p style="color:var(--muted); line-height:1.8; font-size:0.9rem;">匯款</p>
+    </div>
+
+    <div>
+      <p class="contact-label">交稿時間</p>
+      <p style="color:var(--muted); line-height:1.8; font-size:0.9rem;">視工作量而定，至少一週，確認後告知預計時程</p>
+    </div>
+
+    <div>
+      <p class="contact-label">不接受項目</p>
+      <p style="color:var(--muted); line-height:1.8; font-size:0.9rem;">R18・真人・他人原創角色（需授權）・侵權內容</p>
+    </div>
+
+    <div>
+      <p class="contact-label">版權說明</p>
+      <p style="color:var(--muted); line-height:1.8; font-size:0.9rem;">完稿版權歸我方，商業用途請加購</p>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
